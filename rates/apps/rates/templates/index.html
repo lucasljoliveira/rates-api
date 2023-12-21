@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Highcharts</title>
+  <script src="https://code.highcharts.com/stock/highstock.js"></script>
+  <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+  <script src="https://code.highcharts.com/modules/series-label.js"></script>
+  <script src="https://code.highcharts.com/modules/exporting.js"></script>
+  <script src="https://code.highcharts.com/modules/export-data.js"></script>
+  <script src="https://code.highcharts.com/modules/accessibility.js"></script>
+
+</head>
+<body>
+  <form id="filtroForm" method="GET" action="{% url 'rates' %}">
+    <label for="date__gte">Data Início:</label>
+    <input type="date" id="date__gte" name="date__gte" value={{date__gte}} required>
+
+    <label for="date__lte">Data Fim:</label>
+    <input type="date" id="date__lte" name="date__lte" value={{date__lte}} required disabled>
+
+    <label for="symbol">symbol:</label>
+    <select id="symbol" name="symbol" required>
+        <option value="EUR">EUR</option>
+        <option value="USD">USD</option>
+        <option value="BRL">BRL</option>
+    </select>
+    <button type="submit">Filtrar</button>
+  </form>
+
+  <div id="container"></div>
+  <script>
+    var currentDate = new Date();
+    var dataInicioInput = document.getElementById("date__gte");
+    var dataFimInput = document.getElementById("date__lte");
+    var formattedDate = currentDate.toISOString().split('T')[0];
+
+    if (!dataInicioInput.value) {
+      dataInicioInput.value = formattedDate;
+    }
+
+    if (!dataFimInput.value) {
+      dataFimInput.value = formattedDate;
+    }
+    if (dataFimInput.value) {
+      dataFimInput.disabled = false;
+    }
+
+    dataInicioInput.addEventListener("input", function() {
+        dataFimInput.disabled = false;
+    });
+    dataInicioInput.addEventListener("input", function() {
+      var dataInicioValue = new Date(dataInicioInput.value);
+      var dataFimValue = new Date(dataFimInput.value);
+      var dataMaximaFim = new Date(dataInicioValue);
+      dataMaximaFim.setDate(dataMaximaFim.getDate() + 7);
+
+      var dataMaximaFimFormatada = dataMaximaFim.toISOString().split('T')[0];
+
+      dataFimInput.setAttribute("max", dataMaximaFimFormatada);
+      var dataMinimaFim = new Date(dataInicioValue);
+
+      var dataMinimaFimFormatada = dataMinimaFim.toISOString().split('T')[0];
+
+      dataFimInput.setAttribute("min", dataMinimaFimFormatada);
+      if (dataFimValue <= dataInicioValue) {
+        alert("A data final deve ser maior que a data inicial.");
+        event.preventDefault();
+      }
+  });
+  </script>
+
+  <script>
+    var selectsymbol = document.getElementById("symbol");
+      var rates = {{ rates|safe }};
+
+      Highcharts.stockChart('container', {
+      rangeSelector: {
+        enabled: false
+      },
+      navigator: {
+        enabled: false
+      },
+      title: {
+        text: selectsymbol.value + ' Stock Price'
+      },
+      series: [{
+        name: selectsymbol.value,
+        data: rates,
+        tooltip: {
+          valueDecimals: 2
+        }
+      }],
+      gapSize: 0
+    });
+  </script>
+
+</body>
+</html>
