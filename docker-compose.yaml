@@ -1,0 +1,44 @@
+version: '3'
+
+services:
+  db:
+    image: postgres:13
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    environment:
+      - POSTGRES_DB=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    hostname: "db"
+
+  app:
+    build:
+      context: .
+    ports:
+      - "8000:8000"
+    volumes:
+      - .:/app
+    command: >
+      sh -c "python rates/manage.py migrate &&
+             python rates/manage.py create_currencies &&
+             python rates/manage.py runserver 0.0.0.0:8000"
+    env_file:
+      - ./.docker.env
+    depends_on:
+      - db
+
+  test:
+    build:
+      context: .
+    volumes:
+      - .:/app
+    command: >
+      sh -c "poetry install &&
+            poetry run pytest -s rates --cov=rates/apps -l --cov-report term-missing"
+    env_file:
+      - ./.docker.env
+    depends_on:
+      - db
+
+volumes:
+  postgres_data:
