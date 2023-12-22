@@ -66,10 +66,10 @@ jobs:
         APP_VERSION: ${{ vars.MY_NEW_APP_VERSION }}
       run: |
         echo $HEROKU_API_KEY | docker login --username=_ --password-stdin registry.heroku.com
-        docker build -t brmed-app .
-        docker tag brmed-app registry.heroku.com/brmed-app/web:$APP_VERSION
-        docker push registry.heroku.com/brmed-app/web:$APP_VERSION
+        docker build -t rates-api .
+        docker tag rates-api registry.heroku.com/rates-api/web:$APP_VERSION
+        docker push registry.heroku.com/rates-api/web:$APP_VERSION
 
     - name: Release to Heroku
       if: startsWith(github.ref, 'refs/tags/') && github.ref == 'refs/heads/main'
-      run: heroku container:release web:$APP_VERSION -a brmed-app
+      run: heroku container:release web:$APP_VERSION -a rates-api
