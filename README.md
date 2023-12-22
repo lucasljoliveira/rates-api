@@ -24,8 +24,8 @@ Application responsible for store, manage present rates from VATCOMPLY.
 
 ## Configuration
 
-1. Clone o repository: `git clone https://github.com/<your-user>/brmed.git`
-2. Access project directory: `cd brmed`
+1. Clone o repository: `git clone https://github.com/<your-user>/rates-api.git`
+2. Access project directory: `cd rates-api`
 
 ## Usage
 
