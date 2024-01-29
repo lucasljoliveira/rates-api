@@ -18,7 +18,7 @@ class CurrencyViewSet(viewsets.ModelViewSet):
 
 
 class RateViewSet(viewsets.ModelViewSet):
-    queryset = Rates.objects.all()
+    queryset = Rates.objects.select_related("base").all()
     serializer_class = RateSerializer
     filterset_class = RatesFilter
 
